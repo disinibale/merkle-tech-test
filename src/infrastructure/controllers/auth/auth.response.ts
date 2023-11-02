@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class IsAuthReponse {
+export class IsAuthResponse {
   @ApiProperty()
   username: string;
 }

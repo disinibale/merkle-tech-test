@@ -57,8 +57,6 @@ export class LoginFeature {
   async validateUserJwtStrategy(username: string) {
     const user = await this.userRepository.userByUsername(username);
 
-    console.log(username, '<<<<<<<<<<<<<<< USERNAME');
-
     if (user) {
       return user;
     }
