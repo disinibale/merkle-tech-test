@@ -5,6 +5,8 @@ export interface WalletRepositoryDomain {
     walletsWhereUniqueInput: Prisma.WalletsWhereUniqueInput,
   ): Promise<Wallets | null>;
 
+  walletByUsername(username: string): Promise<Wallets | null>;
+
   wallets(params: {
     skip?: number;
     take?: number;
