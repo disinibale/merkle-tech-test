@@ -6,6 +6,7 @@ export interface WalletRepositoryDomain {
   ): Promise<Wallets | null>;
 
   walletByUsername(username: string): Promise<Wallets | null>;
+  walletByUsernameTransaction(username: string, tx): Promise<Wallets | null>;
 
   wallets(params: {
     skip?: number;
@@ -23,10 +24,10 @@ export interface WalletRepositoryDomain {
   }): Promise<Wallets>;
 
   updateWalletTransaction(params: {
-    tx: any;
+    tx: Prisma.TransactionClient;
     where: Prisma.WalletsWhereUniqueInput;
     data: Prisma.WalletsUpdateInput;
-  });
+  }): Promise<Wallets>;
 
   updateWalletByUserId(params: {
     userId: number;

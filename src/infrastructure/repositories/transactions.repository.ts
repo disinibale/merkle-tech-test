@@ -49,7 +49,29 @@ export class TransactionsRepository implements TransactionRepositoryDomain {
     });
   }
 
-  async createTransaction(data: Prisma.TransactionsCreateInput): Promise<{
+  async transactionGroup(userId: number) {
+    return this.prismaService.transactions.groupBy({
+      by: ['senderWalletId'],
+      _sum: {
+        amount: true,
+      },
+      where: {
+        senderWalletId: {
+          not: userId,
+        },
+      },
+      orderBy: {
+        _sum: {
+          amount: 'desc',
+        },
+      },
+      take: 10,
+    });
+  }
+
+  async createTransaction(
+    data: Prisma.TransactionsUncheckedCreateInput,
+  ): Promise<{
     id: number;
     senderWalletId: number;
     recipientWalletId: number;

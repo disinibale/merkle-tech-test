@@ -3,18 +3,60 @@ import { ILogger } from 'src/domain/logger/logger.interface';
 import { WalletRepositoryDomain } from 'src/domain/repositories/wallets.interface';
 import { ExceptionService } from '../../infrastructure/exception/exception.service';
 import { PrismaServiceBase } from 'src/domain/config/prisma.base';
+import { TransactionRepositoryDomain } from 'src/domain/repositories/transactions.interface';
 
 export class TransferBalanceFeature {
   constructor(
     private readonly logger: ILogger,
     private readonly exceptionService: ExceptionService,
     private readonly walletRepository: WalletRepositoryDomain,
+    private readonly transactionRepository: TransactionRepositoryDomain,
     private readonly prisma: PrismaServiceBase,
   ) {}
 
-  async transferBalance(senderId: number, recipientId: number, amount: number) {
+  async execute(
+    senderUsername: string,
+    recipientUsername: string,
+    amount: number,
+  ) {
     return await this.prisma.$transaction(async (tx) => {
-      const sender = await this.walletRepository.updateWalletTransaction({
+      const senderWallet =
+        await this.walletRepository.walletByUsernameTransaction(
+          senderUsername,
+          tx,
+        );
+
+      if (!senderWallet) {
+        this.exceptionService.notFoundException({
+          message: 'Sender not found',
+          errorCode: 404,
+        });
+      }
+
+      const recipientWallet =
+        await this.walletRepository.walletByUsernameTransaction(
+          recipientUsername,
+          tx,
+        );
+
+      if (!recipientWallet) {
+        this.exceptionService.notFoundException({
+          message: 'Recipient Not Found!',
+          errorCode: 404,
+        });
+      }
+
+      const { userId: senderId } = senderWallet;
+      const { userId: recipientId } = recipientWallet;
+
+      if (senderId === recipientId) {
+        this.exceptionService.badRequestException({
+          message:
+            'The sender username cannot be the same as the recipient username',
+        });
+      }
+
+      const sourceWallet = await this.walletRepository.updateWalletTransaction({
         tx,
         where: {
           userId: senderId,
@@ -26,13 +68,13 @@ export class TransferBalanceFeature {
         },
       });
 
-      if (sender.balance < new Prisma.Decimal(0)) {
+      if (sourceWallet.balance < new Prisma.Decimal(0)) {
         this.exceptionService.conflictException({
-          message: `Sender doesn't have enough balance to send ${amount}`,
+          message: `Sender balance is insufficient to transfer ${amount}`,
         });
       }
 
-      const recipient = await this.walletRepository.updateWalletTransaction({
+      const targetWallet = await this.walletRepository.updateWalletTransaction({
         tx,
         where: {
           userId: recipientId,
@@ -44,12 +86,20 @@ export class TransferBalanceFeature {
         },
       });
 
-      this.logger.log(
-        'Wallet',
-        `User ${sender.userId} successfully transfer balance of ${amount} to ${recipientId}`,
-      );
+      const createdTransaction =
+        await this.transactionRepository.createTransaction({
+          senderWalletId: senderId,
+          recipientWalletId: recipientId,
+          amount,
+        });
 
-      return { senderId: sender.userId, recipientId: recipient.userId, amount };
+      this.logger.debug('Create Transaction', `${createdTransaction}`);
+
+      return {
+        amount,
+        senderId: targetWallet.userId,
+        recipientId: targetWallet.userId,
+      };
     });
   }
 }

@@ -1,18 +1,21 @@
-import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
 
 export class WalletTopUpValidation {
   @IsNotEmpty()
   @IsNumber()
   @Min(1)
-  readonly amount: string;
+  @Max(10000000)
+  readonly amount: number;
 }
 
 export class WalletTransferValidation {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   to_username: string;
 
   @IsNumber()
   @Min(1)
-  amount: string;
+  @Max(10000000)
+  @IsNotEmpty()
+  amount: number;
 }

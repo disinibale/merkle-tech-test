@@ -29,6 +29,9 @@ import { UsersRepository } from '../repositories/users.repository';
 import { PrismaService } from '../config/prisma/prisma.service';
 
 import { FeaturePresenter } from './presenter';
+import { TransactionsRepository } from '../repositories/transactions.repository';
+import { GetTopTransactionFeature } from 'src/features/transaction/getTopTransaction.feature';
+import { GetAggregatedValueFeature } from 'src/features/transaction/getAggregatedValue.feature';
 
 @Module({
   imports: [
@@ -52,6 +55,10 @@ export class PresenterModule {
   static READ_BALANCE_PRESENTER = 'ReadBalancePresenter';
   static TOP_UP_BALANCE_PRESENTER = 'TopUpBalancePresenter';
   static TRANSFER_BALANCE_PRESENTER = 'TransferBalancePresenter';
+  // Transaction Features
+  static GET_TOP_TRANSACTION_PRESENTER = 'GetTopTransactionPresenter';
+  static GET_AGGREGATED_TRANSACTION_PRESENTER =
+    'GetAggregatedTransactionPresenter';
 
   static register(): DynamicModule {
     return {
@@ -150,6 +157,7 @@ export class PresenterModule {
             LoggerService,
             ExceptionService,
             WalletsRepository,
+            TransactionsRepository,
             PrismaService,
           ],
           provide: PresenterModule.TRANSFER_BALANCE_PRESENTER,
@@ -157,6 +165,7 @@ export class PresenterModule {
             loggerService: LoggerService,
             exceptionService: ExceptionService,
             walletRepository: WalletsRepository,
+            transactionRepository: TransactionsRepository,
             prismaService: PrismaService,
           ) =>
             new FeaturePresenter(
@@ -164,8 +173,25 @@ export class PresenterModule {
                 loggerService,
                 exceptionService,
                 walletRepository,
+                transactionRepository,
                 prismaService,
               ),
+            ),
+        },
+        {
+          inject: [TransactionsRepository],
+          provide: PresenterModule.GET_TOP_TRANSACTION_PRESENTER,
+          useFactory: (transactionRepository: TransactionsRepository) =>
+            new FeaturePresenter(
+              new GetTopTransactionFeature(transactionRepository),
+            ),
+        },
+        {
+          inject: [TransactionsRepository],
+          provide: PresenterModule.GET_AGGREGATED_TRANSACTION_PRESENTER,
+          useFactory: (transactionRepository: TransactionsRepository) =>
+            new FeaturePresenter(
+              new GetAggregatedValueFeature(transactionRepository),
             ),
         },
       ],
@@ -180,6 +206,9 @@ export class PresenterModule {
         PresenterModule.READ_BALANCE_PRESENTER,
         PresenterModule.TOP_UP_BALANCE_PRESENTER,
         PresenterModule.TRANSFER_BALANCE_PRESENTER,
+        // Transaction Feature
+        PresenterModule.GET_TOP_TRANSACTION_PRESENTER,
+        PresenterModule.GET_AGGREGATED_TRANSACTION_PRESENTER,
       ],
     };
   }

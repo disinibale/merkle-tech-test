@@ -9,4 +9,5 @@ export interface IException {
   forbiddenException(data?: IFormatExceptionMessage): void;
   unauthorizedException(data?: IFormatExceptionMessage): void;
   conflictException(data?: IFormatExceptionMessage): void;
+  notFoundException(data?: IFormatExceptionMessage): void;
 }

@@ -14,9 +14,8 @@ export class ReadBalanceFeature {
 
   async checkIfBallanceSufficient(username: string): Promise<boolean> {
     const wallet = await this.readCurrentBalance(username);
-    const zeroBalance: Prisma.Decimal = 0;
 
-    if (wallet.balance > zeroBalance) {
+    if (wallet.balance > new Prisma.Decimal(0)) {
       return true;
     }
 

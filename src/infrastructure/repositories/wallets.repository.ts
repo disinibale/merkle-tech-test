@@ -36,6 +36,24 @@ export class WalletsRepository implements WalletRepositoryDomain {
       },
     });
   }
+  async walletByUsernameTransaction(
+    username: string,
+    tx: Prisma.TransactionClient,
+  ): Promise<{
+    id: number;
+    userId: number;
+    balance: Prisma.Decimal;
+    createdAt: Date;
+    updatedAt: Date;
+  }> {
+    return tx.wallets.findFirst({
+      where: {
+        user: {
+          username,
+        },
+      },
+    });
+  }
 
   async wallets(params: {
     skip?: number;

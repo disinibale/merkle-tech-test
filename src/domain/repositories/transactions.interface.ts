@@ -13,8 +13,19 @@ export interface TransactionRepositoryDomain {
     orderBy?: Prisma.TransactionsOrderByWithRelationInput;
   }): Promise<Transactions[]>;
 
+  transactionGroup(userId: number): Promise<
+    (Prisma.PickEnumerable<
+      Prisma.TransactionsGroupByOutputType,
+      'senderWalletId'[]
+    > & {
+      _sum: {
+        amount: Prisma.Decimal;
+      };
+    })[]
+  >;
+
   createTransaction(
-    data: Prisma.TransactionsCreateInput,
+    data: Prisma.TransactionsUncheckedCreateInput,
   ): Promise<Transactions>;
 
   updateTransaction(params: {

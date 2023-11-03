@@ -17,12 +17,22 @@ import {
 } from './wallet.validations';
 import { IUserSession, User } from 'src/domain/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/infrastructure/commons/guards/jwtAuth.guard';
+import { ReadBalanceFeature } from 'src/features/wallet/readBalance.feature';
+import { TransferBalanceFeature } from 'src/features/wallet/transferBalance.feature';
+import { ExceptionService } from 'src/infrastructure/exception/exception.service';
+import { LoggerService } from 'src/infrastructure/logger/logger.service';
 
 @Controller('wallet')
 export class WalletController {
   constructor(
     @Inject(PresenterModule.TOP_UP_BALANCE_PRESENTER)
     private readonly topUpFeature: FeaturePresenter<TopUpBalanceFeature>,
+    @Inject(PresenterModule.READ_BALANCE_PRESENTER)
+    private readonly readBalanceFeature: FeaturePresenter<ReadBalanceFeature>,
+    @Inject(PresenterModule.TRANSFER_BALANCE_PRESENTER)
+    private readonly transferBalanceFeature: FeaturePresenter<TransferBalanceFeature>,
+    private readonly exceptionService: ExceptionService,
+    private readonly loggerService: LoggerService,
   ) {}
 
   @Post('topup')
@@ -33,28 +43,45 @@ export class WalletController {
     @Res() response: Response,
   ) {
     const { amount } = body;
-    const { id, username } = session;
-    response.status(200).json({ amount, id, username });
+    const { id: userId } = session;
+
+    await this.topUpFeature.getInstance().execute(userId, amount);
+
+    response.status(201).json({ message: 'Top up Successful!' });
   }
 
   @Get('balance')
   @UseGuards(JwtAuthGuard)
   async getBalance(@User() session: IUserSession, @Res() response: Response) {
-    const { username, id } = session;
+    const { username } = session;
+    const { balance } = await this.readBalanceFeature
+      .getInstance()
+      .readCurrentBalance(username);
 
-    response.status(200).json({ username, id });
+    return response.status(200).json({
+      balance: balance,
+    });
   }
 
   @Post('transfer')
   @UseGuards(JwtAuthGuard)
-  async transferBalance(
+  async transfer(
     @Body() body: WalletTransferValidation,
     @User() session: IUserSession,
     @Res() response: Response,
   ) {
-    const { username: sender, id: senderId } = session;
-    const { amount, to_username: recipient } = body;
+    try {
+      const { amount, to_username: recipient } = body;
+      const { username: sender } = session;
 
-    return response.status(200).json({ senderId, sender, amount, recipient });
+      const result = await this.transferBalanceFeature
+        .getInstance()
+        .execute(sender, recipient, amount);
+
+      return response.status(200).json(result);
+    } catch (err) {
+      this.loggerService.error('Wallet', err);
+      throw err;
+    }
   }
 }
