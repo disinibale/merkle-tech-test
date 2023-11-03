@@ -5,11 +5,11 @@ import { WalletRepositoryDomain } from 'src/domain/repositories/wallets.interfac
 export class ReadBalanceFeature {
   constructor(
     private readonly loggerService: ILogger,
-    private readonly walletService: WalletRepositoryDomain,
+    private readonly walletRepository: WalletRepositoryDomain,
   ) {}
 
   async readCurrentBalance(username: string) {
-    return await this.walletService.walletByUsername(username);
+    return await this.walletRepository.walletByUsername(username);
   }
 
   async checkIfBallanceSufficient(username: string): Promise<boolean> {

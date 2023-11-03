@@ -22,5 +22,16 @@ export interface WalletRepositoryDomain {
     data: Prisma.WalletsUpdateInput;
   }): Promise<Wallets>;
 
+  updateWalletTransaction(params: {
+    tx: any;
+    where: Prisma.WalletsWhereUniqueInput;
+    data: Prisma.WalletsUpdateInput;
+  });
+
+  updateWalletByUserId(params: {
+    userId: number;
+    data: Prisma.WalletsUpdateInput;
+  }): Promise<Wallets>;
+
   deleteWallet(where: Prisma.WalletsWhereUniqueInput): Promise<Wallets>;
 }

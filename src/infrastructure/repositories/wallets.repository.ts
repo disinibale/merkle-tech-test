@@ -86,6 +86,34 @@ export class WalletsRepository implements WalletRepositoryDomain {
     return this.prismaService.wallets.update({ where, data });
   }
 
+  async updateWalletTransaction(params: {
+    tx: Prisma.TransactionClient;
+    where: Prisma.WalletsWhereUniqueInput;
+    data: Prisma.WalletsUpdateInput;
+  }) {
+    const { tx, where, data } = params;
+    return await tx.wallets.update({ where, data });
+  }
+
+  async updateWalletByUserId(params: {
+    userId: number;
+    data: Prisma.WalletsUpdateInput;
+  }): Promise<{
+    id: number;
+    userId: number;
+    balance: Prisma.Decimal;
+    createdAt: Date;
+    updatedAt: Date;
+  }> {
+    const { userId, data } = params;
+    return this.prismaService.wallets.update({
+      where: {
+        userId,
+      },
+      data,
+    });
+  }
+
   async deleteWallet(where: Prisma.WalletsWhereUniqueInput): Promise<{
     id: number;
     userId: number;

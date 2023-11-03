@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Controller, Inject, Post, UseGuards, Res, Body } from '@nestjs/common';
 
-import { AuthLoginDto } from './auth.validation';
+import { AuthLoginDto } from './auth.validations';
 
 import { FeaturePresenter } from 'src/infrastructure/presenter/presenter';
 import { PresenterModule } from 'src/infrastructure/presenter/presenter.module';
@@ -64,10 +64,10 @@ export class AuthController {
 
   @Post('is-authenticated')
   @UseGuards(JwtAuthGuard)
-  async isAuthenticated(@User() userSession) {
+  async isAuthenticated(@User() session) {
     const user = await this.isAuthFeature
       .getInstance()
-      .execute(userSession.username);
+      .execute(session.username);
     const response = new IsAuthResponse();
     response.username = user.username;
 
@@ -77,10 +77,10 @@ export class AuthController {
   @Post('refresh-token')
   @UseGuards(JwtRefreshGuard)
   @ApiBearerAuth()
-  async refreshAccessToken(@Res() response: Response, @User() userSession) {
+  async refreshAccessToken(@Res() response: Response, @User() session) {
     const accessTokenCookie = await this.loginFeature
       .getInstance()
-      .getCookiesWithToken(userSession.username);
+      .getCookiesWithToken(session.username);
     response.setHeader('Set-Cookie', accessTokenCookie);
     return response
       .status(200)
