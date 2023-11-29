@@ -3,11 +3,11 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { IsAuthenticatedFeature } from 'src/features/auth/isAuthenticated.feature';
 import { LogoutFeature } from 'src/features/auth/logout.feature';
 import { LoginFeature } from 'src/features/auth/login.feature';
-
-import { TransferBalanceFeature } from 'src/features/wallet/transferBalance.feature';
-import { TopUpBalanceFeature } from 'src/features/wallet/topUpBalance.feature';
-import { ReadBalanceFeature } from 'src/features/wallet/readBalance.feature';
 import { RegisterFeature } from 'src/features/auth/register.feature';
+import { CreateProductFeature } from 'src/features/products/createProduct.feature';
+import { GetProductsFeature } from 'src/features/products/getProducts.feature';
+import { UpdateProductFeature } from 'src/features/products/updateProduct.feature';
+import { DeleteProductFeature } from 'src/features/products/deleteProduct.feature';
 
 import { EnvironmentConfigModule } from '../config/environment-config/environment-config.module';
 import { RepositoriesModule } from '../repositories/repositories.module';
@@ -23,15 +23,17 @@ import { BcryptService } from '../services/bcrypt/bcrypt.service';
 import { JwtTokenService } from '../services/jwt/jwt.service';
 import { LoggerService } from '../logger/logger.service';
 
-import { WalletsRepository } from '../repositories/wallets.repository';
 import { UsersRepository } from '../repositories/users.repository';
-
-import { PrismaService } from '../config/prisma/prisma.service';
-
+import { ProductsRepository } from '../repositories/products.repository';
 import { FeaturePresenter } from './presenter';
-import { TransactionsRepository } from '../repositories/transactions.repository';
-import { GetTopTransactionFeature } from 'src/features/transaction/getTopTransaction.feature';
-import { GetAggregatedValueFeature } from 'src/features/transaction/getAggregatedValue.feature';
+import { OrdersRepository } from '../repositories/orders.repository';
+import { GetCartFeature } from 'src/features/carts/getCart.feature';
+import { AddItemFeature } from 'src/features/carts/addItem.feature';
+import { OrderItemsRepository } from '../repositories/orderItems.repository';
+import { PrismaService } from '../config/prisma/prisma.service';
+import { RemoveItemFeature } from 'src/features/carts/removeItem.feature';
+import { ModifyItemQuantityFeature } from 'src/features/carts/modifyItemQuantity.feature';
+import { CheckoutOrderFeature } from 'src/features/checkouts/checkoutOrder.feature';
 
 @Module({
   imports: [
@@ -51,14 +53,18 @@ export class PresenterModule {
   static LOGOUT_FEATURE_PRESENTER = 'LogoutFeaturePresenter';
   // Register Features
   static REGISTER_FEATURE_PRESENTER = 'RegisterFeaturePresenter';
-  // Wallet Features
-  static READ_BALANCE_PRESENTER = 'ReadBalancePresenter';
-  static TOP_UP_BALANCE_PRESENTER = 'TopUpBalancePresenter';
-  static TRANSFER_BALANCE_PRESENTER = 'TransferBalancePresenter';
-  // Transaction Features
-  static GET_TOP_TRANSACTION_PRESENTER = 'GetTopTransactionPresenter';
-  static GET_AGGREGATED_TRANSACTION_PRESENTER =
-    'GetAggregatedTransactionPresenter';
+  // Product Features
+  static CREATE_PRODUCT_FEATURE_PRESENTER = 'CreateProductFeaturePresenter';
+  static GET_PRODUCTS_FEATURE_PRESENTER = 'GetProductsFeaturePresenter';
+  static UPDATE_PRODUCT_FEATURE_PRESENTER = 'UpdateProductFeaturePresenter';
+  static DELETE_PRODUCT_FEATURE_PRESENTER = 'DeleteProductFeaturePresenter';
+  // Cart Features
+  static GET_CART_FEATURE_PRESENTER = 'GetCartFeaturePresenter';
+  static ADD_ITEM_CART_FEATURE_PRESENTER = 'AddItemCartFeaturePresenter';
+  static REMOVE_ITEM_CART_FEATURE_PRESENTER = 'RemoveItemCartFeaturePresenter';
+  static MODIFY_ITEM_CART_FEATURE_PRESENTER = 'ModifyItemCartFeaturePresenter';
+  // Checkout Features
+  static CHECKOUT_CART_FEATURE_PRESENTER = 'checkoutCartFeaturePresenter';
 
   static register(): DynamicModule {
     return {
@@ -129,69 +135,159 @@ export class PresenterModule {
               ),
             ),
         },
-        // -- Wallet Features --
+        // -- Products Feature --
         {
-          inject: [LoggerService, WalletsRepository],
-          provide: PresenterModule.READ_BALANCE_PRESENTER,
+          inject: [ProductsRepository],
+          provide: PresenterModule.CREATE_PRODUCT_FEATURE_PRESENTER,
+          useFactory: (productRepository: ProductsRepository) =>
+            new FeaturePresenter(new CreateProductFeature(productRepository)),
+        },
+        {
+          inject: [ProductsRepository, ExceptionService],
+          provide: PresenterModule.GET_PRODUCTS_FEATURE_PRESENTER,
           useFactory: (
-            loggerService: LoggerService,
-            walletRepository: WalletsRepository,
+            productRepository: ProductsRepository,
+            exceptionService: ExceptionService,
           ) =>
             new FeaturePresenter(
-              new ReadBalanceFeature(loggerService, walletRepository),
+              new GetProductsFeature(productRepository, exceptionService),
             ),
         },
         {
-          inject: [LoggerService, WalletsRepository],
-          provide: PresenterModule.TOP_UP_BALANCE_PRESENTER,
+          inject: [ProductsRepository, ExceptionService],
+          provide: PresenterModule.UPDATE_PRODUCT_FEATURE_PRESENTER,
           useFactory: (
-            loggerService: LoggerService,
-            walletRepository: WalletsRepository,
+            productRepository: ProductsRepository,
+            exceptionService: ExceptionService,
           ) =>
             new FeaturePresenter(
-              new TopUpBalanceFeature(loggerService, walletRepository),
+              new UpdateProductFeature(productRepository, exceptionService),
             ),
         },
+        {
+          inject: [ProductsRepository, ExceptionService],
+          provide: PresenterModule.DELETE_PRODUCT_FEATURE_PRESENTER,
+          useFactory: (
+            productRepository: ProductsRepository,
+            exceptionService: ExceptionService,
+          ) =>
+            new FeaturePresenter(
+              new DeleteProductFeature(productRepository, exceptionService),
+            ),
+        },
+        // Cart Features
+        // Get Cart
         {
           inject: [
-            LoggerService,
-            ExceptionService,
-            WalletsRepository,
-            TransactionsRepository,
+            ProductsRepository,
+            OrdersRepository,
+            OrderItemsRepository,
             PrismaService,
+            ExceptionService,
           ],
-          provide: PresenterModule.TRANSFER_BALANCE_PRESENTER,
+          provide: PresenterModule.ADD_ITEM_CART_FEATURE_PRESENTER,
           useFactory: (
-            loggerService: LoggerService,
-            exceptionService: ExceptionService,
-            walletRepository: WalletsRepository,
-            transactionRepository: TransactionsRepository,
+            productRepository: ProductsRepository,
+            ordersRepository: OrdersRepository,
+            orderItemsRepository: OrderItemsRepository,
             prismaService: PrismaService,
+            exceptionService: ExceptionService,
           ) =>
             new FeaturePresenter(
-              new TransferBalanceFeature(
-                loggerService,
-                exceptionService,
-                walletRepository,
-                transactionRepository,
+              new AddItemFeature(
+                productRepository,
+                ordersRepository,
+                orderItemsRepository,
                 prismaService,
+                exceptionService,
               ),
             ),
         },
         {
-          inject: [TransactionsRepository],
-          provide: PresenterModule.GET_TOP_TRANSACTION_PRESENTER,
-          useFactory: (transactionRepository: TransactionsRepository) =>
+          inject: [OrdersRepository],
+          provide: PresenterModule.GET_CART_FEATURE_PRESENTER,
+          useFactory: (ordersRepository: OrdersRepository) =>
+            new FeaturePresenter(new GetCartFeature(ordersRepository)),
+        },
+        // Remove Item From Cart
+        {
+          inject: [
+            OrderItemsRepository,
+            OrdersRepository,
+            ProductsRepository,
+            PrismaService,
+            ExceptionService,
+          ],
+          provide: PresenterModule.REMOVE_ITEM_CART_FEATURE_PRESENTER,
+          useFactory: (
+            orderItemRepository: OrderItemsRepository,
+            ordersRepository: OrdersRepository,
+            productRepository: ProductsRepository,
+            prismaService: PrismaService,
+            exceptionService: ExceptionService,
+          ) =>
             new FeaturePresenter(
-              new GetTopTransactionFeature(transactionRepository),
+              new RemoveItemFeature(
+                orderItemRepository,
+                productRepository,
+                ordersRepository,
+                prismaService,
+                exceptionService,
+              ),
             ),
         },
+        // Modify Cart
         {
-          inject: [TransactionsRepository],
-          provide: PresenterModule.GET_AGGREGATED_TRANSACTION_PRESENTER,
-          useFactory: (transactionRepository: TransactionsRepository) =>
+          inject: [
+            OrderItemsRepository,
+            OrdersRepository,
+            ProductsRepository,
+            PrismaService,
+            ExceptionService,
+          ],
+          provide: PresenterModule.MODIFY_ITEM_CART_FEATURE_PRESENTER,
+          useFactory: (
+            orderItemRepository: OrderItemsRepository,
+            ordersRepository: OrdersRepository,
+            productRepository: ProductsRepository,
+            prismaService: PrismaService,
+            exceptionService: ExceptionService,
+          ) =>
             new FeaturePresenter(
-              new GetAggregatedValueFeature(transactionRepository),
+              new ModifyItemQuantityFeature(
+                ordersRepository,
+                orderItemRepository,
+                productRepository,
+                prismaService,
+                exceptionService,
+              ),
+            ),
+        },
+        // Checkout Feature
+        {
+          inject: [
+            OrderItemsRepository,
+            OrdersRepository,
+            ProductsRepository,
+            PrismaService,
+            ExceptionService,
+          ],
+          provide: PresenterModule.CHECKOUT_CART_FEATURE_PRESENTER,
+          useFactory: (
+            orderItemRepository: OrderItemsRepository,
+            ordersRepository: OrdersRepository,
+            productsRepository: ProductsRepository,
+            prismaService: PrismaService,
+            exceptionService: ExceptionService,
+          ) =>
+            new FeaturePresenter(
+              new CheckoutOrderFeature(
+                ordersRepository,
+                orderItemRepository,
+                productsRepository,
+                prismaService,
+                exceptionService,
+              ),
             ),
         },
       ],
@@ -202,13 +298,18 @@ export class PresenterModule {
         PresenterModule.LOGOUT_FEATURE_PRESENTER,
         // Register Features
         PresenterModule.REGISTER_FEATURE_PRESENTER,
-        // Wallets Feature
-        PresenterModule.READ_BALANCE_PRESENTER,
-        PresenterModule.TOP_UP_BALANCE_PRESENTER,
-        PresenterModule.TRANSFER_BALANCE_PRESENTER,
-        // Transaction Feature
-        PresenterModule.GET_TOP_TRANSACTION_PRESENTER,
-        PresenterModule.GET_AGGREGATED_TRANSACTION_PRESENTER,
+        // Product Features
+        PresenterModule.CREATE_PRODUCT_FEATURE_PRESENTER,
+        PresenterModule.GET_PRODUCTS_FEATURE_PRESENTER,
+        PresenterModule.UPDATE_PRODUCT_FEATURE_PRESENTER,
+        PresenterModule.DELETE_PRODUCT_FEATURE_PRESENTER,
+        // Cart Features
+        PresenterModule.GET_CART_FEATURE_PRESENTER,
+        PresenterModule.ADD_ITEM_CART_FEATURE_PRESENTER,
+        PresenterModule.REMOVE_ITEM_CART_FEATURE_PRESENTER,
+        PresenterModule.MODIFY_ITEM_CART_FEATURE_PRESENTER,
+        // Checkout Features
+        PresenterModule.CHECKOUT_CART_FEATURE_PRESENTER,
       ],
     };
   }

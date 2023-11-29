@@ -1,7 +1,8 @@
+import { Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
+
 import { UserRepositoryDomain } from 'src/domain/repositories/users.interface';
 import { PrismaService } from '../config/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersRepository implements UserRepositoryDomain {
@@ -13,6 +14,7 @@ export class UsersRepository implements UserRepositoryDomain {
     password: string;
     lastLogin: Date;
     hashRefreshToken: string;
+    roles: string[];
     createdAt: Date;
     updatedAt: Date;
   }> {
@@ -27,12 +29,26 @@ export class UsersRepository implements UserRepositoryDomain {
     password: string;
     lastLogin: Date;
     hashRefreshToken: string;
+    roles: string[];
     createdAt: Date;
     updatedAt: Date;
   }> {
     return this.prismaService.users.findFirst({
       where: { username },
     });
+  }
+
+  async userRoleByUsername(username: string): Promise<string[]> {
+    const user = await this.prismaService.users.findFirst({
+      where: {
+        username,
+      },
+      select: {
+        roles: true,
+      },
+    });
+
+    return [...user.roles];
   }
 
   async users(params: {
@@ -48,6 +64,7 @@ export class UsersRepository implements UserRepositoryDomain {
       password: string;
       lastLogin: Date;
       hashRefreshToken: string;
+      roles: string[];
       createdAt: Date;
       updatedAt: Date;
     }[]
@@ -68,6 +85,7 @@ export class UsersRepository implements UserRepositoryDomain {
     password: string;
     lastLogin: Date;
     hashRefreshToken: string;
+    roles: string[];
     createdAt: Date;
     updatedAt: Date;
   }> {
@@ -83,6 +101,7 @@ export class UsersRepository implements UserRepositoryDomain {
     password: string;
     lastLogin: Date;
     hashRefreshToken: string;
+    roles: string[];
     createdAt: Date;
     updatedAt: Date;
   }> {
@@ -101,6 +120,7 @@ export class UsersRepository implements UserRepositoryDomain {
     password: string;
     lastLogin: Date;
     hashRefreshToken: string;
+    roles: string[];
     createdAt: Date;
     updatedAt: Date;
   }> {

@@ -11,7 +11,7 @@ export class RegisterFeature {
     private readonly userRepository: UserRepositoryDomain,
   ) {}
 
-  async createUserAndWallet(username: string, password) {
+  async createUser(username: string, password) {
     this.logger.log('Register Feature', 'Creating User...');
 
     const hashedPassword = await this.bcryptService.hash(password);
@@ -19,11 +19,6 @@ export class RegisterFeature {
     return await this.userRepository.createUser({
       username,
       password: hashedPassword,
-      wallet: {
-        create: {
-          balance: 0,
-        },
-      },
     });
   }
 

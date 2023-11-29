@@ -1,5 +1,6 @@
 export interface IJwtServicePayload {
   username: string;
+  roles: string[];
 }
 
 export interface IJwtService {

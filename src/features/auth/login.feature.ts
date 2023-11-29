@@ -20,23 +20,33 @@ export class LoginFeature {
   async getCookiesWithToken(username: string) {
     this.logger.log('Login Feature', `User ${username} have been logged in`);
 
-    const payload: IJwtServicePayload = { username: username };
+    const roles = await this.userRepository.userRoleByUsername(username);
+    const payload: IJwtServicePayload = { username: username, roles };
     const secret = this.appConfig.getJwtSecret();
     const expiresIn = this.appConfig.getJwtExpirationTime();
     const token = this.jwtTokenService.createToken(payload, secret, expiresIn);
 
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.appConfig.getJwtExpirationTime()}`;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const response = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.appConfig.getJwtExpirationTime()}; Secure=false; Same-Site=none`;
+
+    // return token;
+    return response;
   }
 
   async getCookiesWithRefreshToken(username: string) {
     this.logger.log('Login Feature', `User ${username} have been logged in`);
 
-    const payload: IJwtServicePayload = { username: username };
+    const roles = await this.userRepository.userRoleByUsername(username);
+    const payload: IJwtServicePayload = { username: username, roles };
     const secret = this.appConfig.getJwtRefreshSecret();
     const expiresIn = this.appConfig.getJwtRefreshExpirationTime();
     const token = this.jwtTokenService.createToken(payload, secret, expiresIn);
 
-    return `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.appConfig.getJwtRefreshExpirationTime()}`;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const response = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.appConfig.getJwtRefreshExpirationTime()}; Secure=false; Same-Site=none`;
+
+    // return token;
+    return response;
   }
 
   async validateUserLocalStrategy(username: string, password: string) {

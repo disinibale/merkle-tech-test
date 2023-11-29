@@ -2,12 +2,19 @@ import { Module } from '@nestjs/common';
 import { PresenterModule } from '../presenter/presenter.module';
 import { AuthController } from './auth/auth.controller';
 import { ExceptionModule } from '../exception/exception.module';
-import { WalletController } from './wallet/wallet.controller';
 import { LoggerModule } from '../logger/logger.module';
-import { TransactionController } from './transaction/transaction.controller';
+import { JwtServiceModule } from '../services/jwt/jwt.module';
+import { ProductsController } from './products/products.controller';
+import { CartsController } from './carts/carts.controller';
+import { CheckoutsController } from './checkouts/checkouts.controller';
 
 @Module({
-  imports: [PresenterModule.register(), ExceptionModule, LoggerModule],
-  controllers: [AuthController, WalletController, TransactionController],
+  imports: [
+    PresenterModule.register(),
+    ExceptionModule,
+    LoggerModule,
+    JwtServiceModule,
+  ],
+  controllers: [AuthController, ProductsController, CartsController, CheckoutsController],
 })
 export class ControllersModule {}

@@ -13,6 +13,19 @@ async function bootstrap() {
 
   const configService = app.get<ConfigService>(ConfigService);
 
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://localhost:5500'],
+    credentials: true,
+    allowedHeaders: [
+      'Access-Control-Allow-Headers',
+      'Access-Control-Expose-Headers',
+      'Authorization',
+      'Content-Type',
+      'Set-Cookie',
+      'X-Requested-With',
+      'ngrok-skip-browser-warning',
+    ],
+  });
   app.useGlobalFilters(new CustomExceptionFilter(new LoggerService()));
   app.useGlobalPipes(new ValidationPipe());
 

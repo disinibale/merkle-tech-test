@@ -1,73 +1,57 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Stealth Startup (E - Commerce Backend System)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This backend application is intended to complete the tasks given by Stealth Startup to continue the hiring process.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# Sytem Design
 
-## Description
+- The application uses an Presenter to bind all services along a single front, acting as a proxy for the domains in which the `auth`, `checkout`, `cart`, and `product` services are deployed on
+- The `auth` service has main functionality for User Login and Register.
+- The `products` service has main functionality for Create, Read, Update and Delete (CRUD)
+- The `cartss` service intended to manipulate the user cart, like add product, remove product and modify the product quantity.
+- The `checkouts` service intended to checkout and update the user order to be paid and update the quantity of the product on the database
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## System Architecture
 
-## Installation
+<img alt="image" src="https://user-images.githubusercontent.com/69677864/223522265-3a585a38-0148-4921-bfea-fd19989c8bff.png">
 
-```bash
-$ pnpm install
+- The architecture for a microservice is inspired by the [Clean Architecture](https://www.freecodecamp.org/news/a-quick-introduction-to-clean-architecture-990c014448d2), which supports strong modularity, loose coupling, and dependency injection
+
+Tech Stack: Node.js, Express, Typescript, Prisma, Jest, and PostgreSQL
+
+## Prerequisites
+
+- Have [npm](https://www.npmjs.com) and [Node.js](https://nodejs.dev/en/) on your machine
+- Have PostgreSQL installed. [postgresql]()
+- Have pnpm installed [pnpm](https://pnpm.io/installation) on your machine.
+
+## Steps to run
+
+### On localhost
+
+1.  Create a .env file following the format specified in the root folder `/.env`
+2.  Setting up all the required environment variable :
+
+```
+NODE_ENV=development
+APP_PORT=5000
+JWT_SECRET=
+JWT_EXPIRATION=
+JWT_REFRESH_SECRET=
+JWT_REFRESH_EXPIRATION=
+DATABASE_URL=postgresql://DBUSER:DBPASSOWRD@DBHOST:DBPORT/DBNAME?schema=DBSCHEMA
 ```
 
-## Running the app
+3.  Run `pnpm install`
+4.  Run the migration `npx prisma db migrate dev`
+5.  Run the database seeder `ts-node ./prisma/seeders/users.seeder.ts`
+6.  Run `pnpm run start:dev` Now you can test the APIs from localhost:5000
 
-```bash
-# development
-$ pnpm run start
+## API Documentations
 
-# watch mode
-$ pnpm run start:dev
+The API Documentations can be accessed through this [Postman Documentation](https://documenter.getpostman.com/view/24159172/2s9YeG6rHR)
 
-# production mode
-$ pnpm run start:prod
-```
+## Future work and improvements
 
-## Test
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+- It could be useful to use docker for containerization in order to bundle up the project into one ecosystem.
+- While I tried to follow a TDD approach - that is, letting test cases guide development - I eventually gave up on it in the name of speedy development. Ideally, I could have written unit tests first, and slowly increment up to integration tests and then system tests.
+- It could be a good exercise to deploy the databases across different platforms (e.g. Firebase, SQL, etc.) to prevent a single point of failure or include the database in the docker ecosystem using docker compose.

@@ -5,6 +5,8 @@ export interface UserRepositoryDomain {
 
   userByUsername(username: string): Promise<Users | null>;
 
+  userRoleByUsername(username: string): Promise<Array<string>>;
+
   users(params: {
     skip?: number;
     take?: number;

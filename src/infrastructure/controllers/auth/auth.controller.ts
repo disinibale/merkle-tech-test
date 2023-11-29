@@ -51,7 +51,9 @@ export class AuthController {
 
     response.setHeader('Set-Cookie', [accessToken, refreshToken]);
 
-    return response.status(200).json(user);
+    return response.status(200).json({
+      message: `User ${username} successfully logged in!`,
+    });
   }
 
   @Post('logout')
@@ -103,7 +105,7 @@ export class AuthController {
 
     const createdUser = await this.registerFeature
       .getInstance()
-      .createUserAndWallet(username, password);
+      .createUser(username, password);
 
     return response.status(201).json(createdUser);
   }
