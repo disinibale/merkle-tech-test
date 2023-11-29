@@ -1,14 +1,30 @@
-# Stealth Startup (E - Commerce Backend System)
+# Merkle Technical Test
 
-This backend application is intended to complete the tasks given by Stealth Startup to continue the hiring process.
+This backend application is intended to complete the tasks given by Merkle Innovation to continue the hiring process.
 
-# Sytem Design
+## API Endpoint
 
-- The application uses an Presenter to bind all services along a single front, acting as a proxy for the domains in which the `auth`, `checkout`, `cart`, and `product` services are deployed on
-- The `auth` service has main functionality for User Login and Register.
-- The `products` service has main functionality for Create, Read, Update and Delete (CRUD)
-- The `cartss` service intended to manipulate the user cart, like add product, remove product and modify the product quantity.
-- The `checkouts` service intended to checkout and update the user order to be paid and update the quantity of the product on the database
+This Backend System has several API Endpoint that can be accessed through this enpoints below :
+
+- `[POST] auth/login` This endpoint is used for Authenticating the user
+- `[POST] auth/login` This endpoint is used for Registering the user
+- `[GET] wedding-books/:id` This endpoint is get the weeding book by id for admin
+- `[GET] wedding-books` This endpoint is get all the weeding book data for admin
+- `[POST] wedding-books` This endpoint is create the weeding book data for admin and guest
+- `[PUT] wedding-books/:id` This endpoint is edit the weeding book data by id for admin
+- `[DELETE] wedding-books/:id` This endpoint is delete the weeding book data by id for admin
+- `[GET] wedding-books/note-gallery` This endpoint is intended to show all the wedding book data for user and has only two properties (name & note)
+- `[GET] wedding-books/soal1` This endpoint intended to answer the question no 1
+
+## System User
+The user for admin can be filled by this username and password in the `auth/login` endpoint:
+```json
+{
+    "username": "bale",
+    "password": "password"
+}
+```
+And for the guest, the user can be registered through `auth/register`
 
 ## System Architecture
 
@@ -16,7 +32,7 @@ This backend application is intended to complete the tasks given by Stealth Star
 
 - The architecture for a microservice is inspired by the [Clean Architecture](https://www.freecodecamp.org/news/a-quick-introduction-to-clean-architecture-990c014448d2), which supports strong modularity, loose coupling, and dependency injection
 
-Tech Stack: Node.js, Express, Typescript, Prisma, Jest, and PostgreSQL
+Tech Stack: Node.js, NestJs, Typescript, Prisma, Jest, and PostgreSQL
 
 ## Prerequisites
 
@@ -48,7 +64,7 @@ DATABASE_URL=postgresql://DBUSER:DBPASSOWRD@DBHOST:DBPORT/DBNAME?schema=DBSCHEMA
 
 ## API Documentations
 
-The API Documentations can be accessed through this [Postman Documentation](https://documenter.getpostman.com/view/24159172/2s9YeG6rHR)
+The API Documentations can be accessed through this [Postman Documentation](https://documenter.getpostman.com/view/24159172/2s9YeG7rjC)
 
 ## Future work and improvements
 

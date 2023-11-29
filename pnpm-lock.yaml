@@ -53,9 +53,6 @@ dependencies:
   passport-local:
     specifier: ^1.0.0
     version: 1.0.0
-  prisma:
-    specifier: ^5.5.2
-    version: 5.5.2
   reflect-metadata:
     specifier: ^0.1.13
     version: 0.1.13
@@ -118,6 +115,9 @@ devDependencies:
   prettier:
     specifier: ^3.0.0
     version: 3.0.3
+  prisma:
+    specifier: ^5.5.2
+    version: 5.5.2
   source-map-support:
     specifier: ^0.5.21
     version: 0.5.21
@@ -1212,7 +1212,6 @@ packages:
   /@prisma/engines@5.5.2:
     resolution: {integrity: sha512-Be5hoNF8k+lkB3uEMiCHbhbfF6aj1GnrTBnn5iYFT7GEr3TsOEp1soviEcBR0tYCgHbxjcIxJMhdbvxALJhAqg==}
     requiresBuild: true
-    dev: false
 
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -4796,7 +4795,6 @@ packages:
     requiresBuild: true
     dependencies:
       '@prisma/engines': 5.5.2
-    dev: false
 
   /process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}

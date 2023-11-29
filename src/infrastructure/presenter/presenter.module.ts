@@ -34,6 +34,8 @@ import { PrismaService } from '../config/prisma/prisma.service';
 import { RemoveItemFeature } from 'src/features/carts/removeItem.feature';
 import { ModifyItemQuantityFeature } from 'src/features/carts/modifyItemQuantity.feature';
 import { CheckoutOrderFeature } from 'src/features/checkouts/checkoutOrder.feature';
+import { BookResourceFeature } from 'src/features/books/booksResource.feature';
+import { BooksRepository } from '../repositories/books.repository';
 
 @Module({
   imports: [
@@ -65,6 +67,9 @@ export class PresenterModule {
   static MODIFY_ITEM_CART_FEATURE_PRESENTER = 'ModifyItemCartFeaturePresenter';
   // Checkout Features
   static CHECKOUT_CART_FEATURE_PRESENTER = 'checkoutCartFeaturePresenter';
+  // Books Resources
+  static BOOKING_RESOURCES_FEATURE_PRESENTER =
+    'BookingResourcesFeaturePresenter';
 
   static register(): DynamicModule {
     return {
@@ -290,6 +295,17 @@ export class PresenterModule {
               ),
             ),
         },
+        {
+          inject: [BooksRepository, ExceptionService],
+          provide: PresenterModule.BOOKING_RESOURCES_FEATURE_PRESENTER,
+          useFactory: (
+            booksRepository: BooksRepository,
+            exceptionService: ExceptionService,
+          ) =>
+            new FeaturePresenter(
+              new BookResourceFeature(booksRepository, exceptionService),
+            ),
+        },
       ],
       exports: [
         // Login Features
@@ -310,6 +326,8 @@ export class PresenterModule {
         PresenterModule.MODIFY_ITEM_CART_FEATURE_PRESENTER,
         // Checkout Features
         PresenterModule.CHECKOUT_CART_FEATURE_PRESENTER,
+        // Books Features
+        PresenterModule.BOOKING_RESOURCES_FEATURE_PRESENTER,
       ],
     };
   }

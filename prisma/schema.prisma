@@ -1,6 +1,5 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["transactionApi"]
 }
 
 datasource db {
@@ -18,6 +17,14 @@ model Users {
   roles            String[]  @default(["user"])
   createdAt        DateTime? @default(now()) @db.Timestamp(6)
   updatedAt        DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model Books {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(255)
+  address     String @db.Text()
+  phoneNumber String @db.VarChar()
+  note        String @db.Text()
 }
 
 model Products {
